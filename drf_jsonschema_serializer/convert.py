@@ -16,7 +16,12 @@ def converter(converter_class):
     return converter_class
 
 
-def field_to_jsonschema(field, skip_readonly=True):
+def field_to_jsonschema(
+    field,
+    skip_readonly=True,
+    include_title=True,
+    include_description=True,
+):
     if isinstance(field, serializers.Serializer):
         result = to_jsonschema(field, skip_readonly=skip_readonly)
     else:
@@ -26,20 +31,30 @@ def field_to_jsonschema(field, skip_readonly=True):
     if result is None:
         return None
 
-    if field.label:
+    if include_title and field.label:
         result["title"] = field.label
-    if field.help_text:
+    if include_description and field.help_text:
         result["description"] = field.help_text
     return result
 
 
-def to_jsonschema(serializer, skip_readonly=True):
+def to_jsonschema(
+    serializer,
+    skip_readonly=True,
+    include_title=True,
+    include_description=True,
+):
     properties = {}
     required = []
     for name, field in serializer.fields.items():
         if skip_readonly and field.read_only:
             continue
-        sub_schema = field_to_jsonschema(field, skip_readonly=skip_readonly)
+        sub_schema = field_to_jsonschema(
+            field,
+            skip_readonly=skip_readonly,
+            include_title=include_title,
+            include_description=include_description,
+        )
         if sub_schema is None:
             continue
 
