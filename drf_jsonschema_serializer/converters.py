@@ -344,3 +344,12 @@ class JSONFieldConverter:
 
     def convert(self, field):
         return {"type": "object"}
+
+
+@converter
+class SerializerMethodFieldConverter:
+    field_class = serializers.SerializerMethodField
+
+    def convert(self, field):
+        method = getattr(field.parent, field.method_name)
+        return method.json_schema
