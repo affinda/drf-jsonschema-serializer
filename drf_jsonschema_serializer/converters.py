@@ -336,3 +336,11 @@ class HiddenFieldConverter:
 
     def convert(self, field):
         return None
+
+
+@converter
+class JSONFieldConverter:
+    field_class = serializers.JSONField
+
+    def convert(self, field):
+        return {"type": "object"}
