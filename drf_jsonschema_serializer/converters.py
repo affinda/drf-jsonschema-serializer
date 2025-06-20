@@ -1,4 +1,5 @@
 # convert a serializer to a JSON Schema.
+import logging
 from typing import Any, Dict, List, Sequence, Type, Union
 
 from rest_framework import fields, serializers
@@ -9,6 +10,8 @@ from .fields import JSONSchemaField, SerializerJSONField
 
 FieldCls = Type[fields.Field]
 FieldClass = Union[FieldCls, List[FieldCls]]
+
+logger = logging.getLogger(__name__)
 
 
 class Error(Exception):
@@ -352,4 +355,9 @@ class SerializerMethodFieldConverter:
 
     def convert(self, field):
         method = getattr(field.parent, field.method_name)
+        if not hasattr(method, "json_schema"):
+            logger.error(
+                f"SerializerMethodField {field.method_name} is not decorated with @json_schema"
+            )
+            return None
         return method.json_schema
