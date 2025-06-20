@@ -16,9 +16,9 @@ def converter(converter_class):
     return converter_class
 
 
-def field_to_jsonschema(field):
+def field_to_jsonschema(field, skip_readonly=True):
     if isinstance(field, serializers.Serializer):
-        result = to_jsonschema(field)
+        result = to_jsonschema(field, skip_readonly=skip_readonly)
     else:
         converter = field_to_converter[field]
         result = converter.convert(field)
@@ -33,13 +33,13 @@ def field_to_jsonschema(field):
     return result
 
 
-def to_jsonschema(serializer):
+def to_jsonschema(serializer, skip_readonly=True):
     properties = {}
     required = []
     for name, field in serializer.fields.items():
-        if field.read_only:
+        if skip_readonly and field.read_only:
             continue
-        sub_schema = field_to_jsonschema(field)
+        sub_schema = field_to_jsonschema(field, skip_readonly=skip_readonly)
         if sub_schema is None:
             continue
 
