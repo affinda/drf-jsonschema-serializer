@@ -328,3 +328,11 @@ class ListSerializerConverter:
         if not field.allow_empty:
             result["minItems"] = 1
         return result
+
+
+@converter
+class HiddenFieldConverter:
+    field_class = serializers.HiddenField
+
+    def convert(self, field):
+        return None

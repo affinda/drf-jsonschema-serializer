@@ -22,6 +22,10 @@ def field_to_jsonschema(field):
     else:
         converter = field_to_converter[field]
         result = converter.convert(field)
+
+    if result is None:
+        return None
+
     if field.label:
         result["title"] = field.label
     if field.help_text:
@@ -36,6 +40,9 @@ def to_jsonschema(serializer):
         if field.read_only:
             continue
         sub_schema = field_to_jsonschema(field)
+        if sub_schema is None:
+            continue
+
         if field.required:
             required.append(name)
         properties[name] = sub_schema
